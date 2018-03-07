@@ -1,4 +1,5 @@
 ## TODO: import all necessary packages and functions
+import pandas as pd 
 
 
 ## Filenames
@@ -49,32 +50,43 @@ def get_time_period():
         print('Time period invalid!')
 
 
-def get_month():
-    '''Asks the user for a month and returns the specified month.
+def get_month(city):
+    '''Asks the user for a month and returns the specified month data as a df.
 
     Args:
-        none.
+        city.
     Returns:
-        TODO: fill out return type and description (see get_city for an example)
+        (pd df object) df 
     '''
-    month = input('\nWhich month? January, February, March, April, May, or June?\n')
-    # TODO: handle raw input and complete function
+    month = input('\nWhich month? Enter the month number such 1 for Jannuary:\n')
+    with open(city, 'r') as f_in:
+        df=pd.read_csv(city)
+        df['month'] = pd.to_datetime(df['Start Time']).dt.month
+        df = df.query('month == @month')
+    return df
 
-
-def get_day(month):
+def get_day(city):
     '''Asks the user for a day and returns the specified day.
 
     Args:
-        none.
+        city.
     Returns:
-        TODO: fill out return type and description (see get_city for an example)
+        (pd df object) df
     '''
-    day = input('\nWhich day? Please type your response as an integer.\n')
-    # TODO: handle raw input and complete function
+    day = input('\nWhich day? Please type your response as an integer, 1 for Monday, 2 for Tuesday\n')
+    with open(city, 'r') as f_in:
+        df=pd.read_csv(city)
+        df['day'] = pd.to_datetime(df['Start Time']).dt.dayofweek
+        df = df.query('day == @day')
+    return df
 
 
 def popular_month(city_file, time_period):
-    '''TODO: fill out docstring with description, arguments, and return values.
+    '''Finds the most popular month based on given city and time period
+    Args:
+        city_file, time_period
+    Returns:
+
     Question: What is the most popular month for start time?
     '''
     # TODO: complete function
@@ -174,7 +186,8 @@ def statistics():
         start_time = time.time()
         
         #TODO: call popular_month function and print the results
-        
+        print popular_month(city, time_period)
+
         print("That took %s seconds." % (time.time() - start_time))
         print("Calculating the next statistic...")
 
