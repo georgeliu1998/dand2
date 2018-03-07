@@ -18,6 +18,14 @@ def get_city():
     city = input('\nHello! Let\'s explore some US bikeshare data!\n'
                  'Would you like to see data for Chicago, New York, or Washington?\n')
     # TODO: handle raw input and complete function
+    if city == 'Chicago':
+        return chicago
+    elif city == 'New York':
+        return new_york_city
+    elif city == 'Washington':
+        return washington
+    else:
+        print('City name invaild!')
 
 
 def get_time_period():
@@ -26,11 +34,19 @@ def get_time_period():
     Args:
         none.
     Returns:
-        TODO: fill out return type and description (see get_city for an example)
+        (str) Period name such as month, day or none
     '''
     time_period = input('\nWould you like to filter the data by month, day, or not at'
                         ' all? Type "none" for no time filter.\n')
     # TODO: handle raw input and complete function
+    if time_period == 'month':
+        return 'month'
+    elif time_period == 'day':
+        return 'day'
+    elif time_period == 'none':
+        return 'none'
+    else:
+        print('Time period invalid!')
 
 
 def get_month():
