@@ -19,11 +19,11 @@ def get_city():
     city = input('\nHello! Let\'s explore some US bikeshare data!\n'
                  'Would you like to see data for Chicago, New York, or Washington?\n')
     # TODO: handle raw input and complete function
-    if city == 'Chicago':
+    if city.lower() == 'chicago':
         return chicago
-    elif city == 'New York':
+    elif city.lower() == 'new york':
         return new_york_city
-    elif city == 'Washington':
+    elif city.lower() == 'washington':
         return washington
     else:
         print('City name invaild!')
@@ -58,7 +58,7 @@ def get_month(city):
     Returns:
         (pd df object) df 
     '''
-    month = input('\nWhich month? Enter the month number such 1 for Jannuary:\n')
+    month = input('\nWhich month? Enter the month number such as 1 for Jannuary:\n')
     with open(city, 'r') as f_in:
         df=pd.read_csv(city)
         df['month'] = pd.to_datetime(df['Start Time']).dt.month
@@ -81,88 +81,127 @@ def get_day(city):
     return df
 
 
-def popular_month(city_file, time_period):
+def popular_month(df):
     '''Finds the most popular month based on given city and time period
     Args:
-        city_file, time_period
+        df
     Returns:
-
+        (int) month number
     Question: What is the most popular month for start time?
     '''
-    # TODO: complete function
+    return pd.to_datetime(df['Start Time']).dt.month.value_counts().idxmax()
 
 
-def popular_day(city_file, time_period):
-    '''TODO: fill out docstring with description, arguments, and return values.
-    Question: What is the most popular day of week (Monday, Tuesday, etc.) for start time?
+def popular_day(df):
+    '''Question: What is the most popular day of week (Monday, Tuesday, etc.) for start time?
+    Args:
+        df
+    Returns:
+        (int) day number
+    '''
+    return pd.to_datetime(df['Start Time']).dt.dayofweek.value_counts().idxmax()
+
+
+def popular_hour(df):
+    '''Question: What is the most popular hour of day for start time?
+    Args:
+        df
+    Returns:
+        (int) hour number
     '''
     # TODO: complete function
 
 
-def popular_hour(city_file, time_period):
-    '''TODO: fill out docstring with description, arguments, and return values.
-    Question: What is the most popular hour of day for start time?
+def trip_duration(df):
+    '''Question: What is the total trip duration and average trip duration?
+    Args:
+        df
+    Returns:
+        (tuple) (total_duration, average_duration)
     '''
-    # TODO: complete function
+    total_duration = df['Trip Duration'].sum()
+    average_duration = df['Trip Duration'].mean()
+    return total_duration, average_duration
 
 
-def trip_duration(city_file, time_period):
-    '''TODO: fill out docstring with description, arguments, and return values.
-    Question: What is the total trip duration and average trip duration?
+def popular_stations(df):
+    '''Question: What is the most popular start station and most popular end station?
+    Args:
+        df
+    Returns:
+        (tuple of strings): start_station, end_station
     '''
-    # TODO: complete function
+    start_station = df['Start Station'].value_counts().idxmax()
+    end_station = df['End Station'].value_counts().idxmax()
+    return start_station, end_station
 
-
-def popular_stations(city_file, time_period):
-    '''TODO: fill out docstring with description, arguments, and return values.
-    Question: What is the most popular start station and most popular end station?
+def popular_trip(df):
+    '''Question: What is the most popular trip?
+    Args:
+        df:
+    Returns:
+        (string) trip
     '''
-    # TODO: complete function
+    return (df['Start Station']+'  TO  '+df['End Station']).value_counts().idxmax()
+    
 
-
-def popular_trip(city_file, time_period):
-    '''TODO: fill out docstring with description, arguments, and return values.
-    Question: What is the most popular trip?
+def users(df):
+    '''Question: What are the counts of each user type?
+    Args:
+        df
+    Returns:
+        (pd.Series) counts
     '''
-    # TODO: complete function
+    return df['User Type'].value_counts()
 
 
-def users(city_file, time_period):
-    '''TODO: fill out docstring with description, arguments, and return values.
-    Question: What are the counts of each user type?
+def gender(df):
+    '''Question: What are the counts of gender?
+    Args:
+        df
+    Returns:
+        (pd.Series) counts
     '''
-    # TODO: complete function
+    return df['Gender'].value_counts()
 
 
-def gender(city_file, time_period):
-    '''TODO: fill out docstring with description, arguments, and return values.
-    Question: What are the counts of gender?
-    '''
-    # TODO: complete function
-
-
-def birth_years(city_file, time_period):
-    '''TODO: fill out docstring with description, arguments, and return values.
-    Question: What are the earliest (i.e. oldest user), most recent (i.e. youngest user),
+def birth_years(df):
+    '''Question: What are the earliest (i.e. oldest user), most recent (i.e. youngest user),
     and most popular birth years?
+    Args:
+        df
+    Retruns:
+        (tuple) oldest, youngest, popular
     '''
-    # TODO: complete function
+    oldest = df['Birth Year'].min()
+    youngest = df['Birth Year'].max()
+    popular = df['Birth Year'].value_counts().idxmax()
+    return oldest, youngest, popular
 
 
-def display_data():
+
+def display_data(df):
     '''Displays five lines of data if the user specifies that they would like to.
     After displaying five lines, ask the user if they would like to see five more,
     continuing asking until they say stop.
 
     Args:
-        none.
+        df
     Returns:
-        TODO: fill out return type and description (see get_city for an example)
+        pandas df object
     '''
     display = input('\nWould you like to view individual trip data?'
                     'Type \'yes\' or \'no\'.\n')
-    # TODO: handle raw input and complete function
+    if display == 'yes':
+        print(df.head(5))
 
+    count = 5
+    display_contd = 'continue'
+    while display_contd == 'continue':
+        display_contd = input('\n\'continue\' or \'stop\'?\n')
+        print(df[count:count+5])
+        count += 5
+    
 
 def statistics():
     '''Calculates and prints out the descriptive statistics about a city and time period
@@ -179,79 +218,49 @@ def statistics():
     # Filter by time period (month, day, none)
     time_period = get_time_period()
 
-    print('Calculating the first statistic...')
+    print('Calculating the statistics...')
 
     # What is the most popular month for start time?
-    if time_period == 'none':
-        start_time = time.time()
-        
-        #TODO: call popular_month function and print the results
-        print popular_month(city, time_period)
+    if time_period == 'month':
+        df = get_month(city)
+    elif time_period == 'day':
+        df = get_day(city)
+    else:
+        with open(city, 'r') as f_in:
+            df=pd.read_csv(city)
 
-        print("That took %s seconds." % (time.time() - start_time))
-        print("Calculating the next statistic...")
+    print('\nWhat is the most popular day of week (Monday, Tuesday, etc.) for start time?') 
+    print(popular_day(df))
 
-    # What is the most popular day of week (Monday, Tuesday, etc.) for start time?
-    if time_period == 'none' or time_period == 'month':
-        start_time = time.time()
-        
-        # TODO: call popular_day function and print the results
-        
-        print("That took %s seconds." % (time.time() - start_time))
-        print("Calculating the next statistic...")    
+    print('\nWhat is the most popular hour of day for start time?')
+    print(popular_hour(df)) 
 
-    start_time = time.time()
+    print('\nWhat is the total trip duration and average trip duration?')
+    print(trip_duration(df))
 
-    # What is the most popular hour of day for start time?
-    # TODO: call popular_hour function and print the results
+    print('\nWhat is the most popular start station and most popular end station?')
+    print(popular_stations(df))
 
-    print("That took %s seconds." % (time.time() - start_time))
-    print("Calculating the next statistic...")
-    start_time = time.time()
+    print('\nWhat is the most popular trip?')
+    print(popular_trip(df)) 
 
-    # What is the total trip duration and average trip duration?
-    # TODO: call trip_duration function and print the results
+    print('\nWhat are the counts of each user type?')
+    print(users(df)) 
 
-    print("That took %s seconds." % (time.time() - start_time))
-    print("Calculating the next statistic...")
-    start_time = time.time()
+    print('\nWhat are the counts of gender?') 
+    if city != 'washington.csv':
+        print(gender(df))
+    else:
+        print('no gender info avaialbe in this dataset')
 
-    # What is the most popular start station and most popular end station?
-    # TODO: call popular_stations function and print the results
-
-    print("That took %s seconds." % (time.time() - start_time))
-    print("Calculating the next statistic...")
-    start_time = time.time()
-
-    # What is the most popular trip?
-    # TODO: call popular_trip function and print the results
-
-    print("That took %s seconds." % (time.time() - start_time))
-    print("Calculating the next statistic...")
-    start_time = time.time()
-
-    # What are the counts of each user type?
-    # TODO: call users function and print the results
-
-    print("That took %s seconds." % (time.time() - start_time))
-    print("Calculating the next statistic...")
-    start_time = time.time()
-
-    # What are the counts of gender?
-    # TODO: call gender function and print the results
-
-    print("That took %s seconds." % (time.time() - start_time))
-    print("Calculating the next statistic...")
-    start_time = time.time()
-
-    # What are the earliest (i.e. oldest user), most recent (i.e. youngest user), and
-    # most popular birth years?
-    # TODO: call birth_years function and print the results
-
-    print("That took %s seconds." % (time.time() - start_time))
+    print('\nWhat are the earliest (i.e. oldest user), most recent (i.e. youngest user), and/nmost popular birth years?') 
+    if city != 'washington.csv':
+        print(birth_years(df))
+    else:
+        print('no birth year info avaialbe in this dataset')
 
     # Display five lines of data at a time if user specifies that they would like to
-    display_data()
+    display_data(df)
 
     # Restart?
     restart = input('\nWould you like to restart? Type \'yes\' or \'no\'.\n')
