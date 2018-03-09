@@ -16,17 +16,22 @@ def get_city():
     Returns:
         (str) Filename for a city's bikeshare data.
     '''
-    city = input('\nHello! Let\'s explore some US bikeshare data!\n'
-                 'Would you like to see data for Chicago, New York, or Washington?\n')
-    # TODO: handle raw input and complete function
+    print('\nHello! Let\'s explore some US bikeshare data!\n')
+
+    invalid_name = True
+    while invalid_name:
+        city = input('Would you like to see data for Chicago, New York, or Washington?\n')
+        if city.lower() in ('chicago', 'new york', 'washington'):
+            invalid_name = False
+        else:
+            print('City name invalid! Please re-enter.')
+    
     if city.lower() == 'chicago':
         return chicago
     elif city.lower() == 'new york':
         return new_york_city
-    elif city.lower() == 'washington':
-        return washington
     else:
-        print('City name invaild!')
+        return washington
 
 
 def get_time_period():
@@ -37,17 +42,21 @@ def get_time_period():
     Returns:
         (str) Period name such as month, day or none
     '''
-    time_period = input('\nWould you like to filter the data by month, day, or not at'
+    invalid_time_period = True
+    while invalid_time_period:
+        time_period = input('\nWould you like to filter the data by month, day, or not at'
                         ' all? Type "none" for no time filter.\n')
-    # TODO: handle raw input and complete function
+        if time_period.lower() in ('month', 'day', 'none'):
+            invalid_time_period = False
+        else:
+            print('Time period invalid! Please re-enter.')
+
     if time_period == 'month':
         return 'month'
     elif time_period == 'day':
         return 'day'
-    elif time_period == 'none':
-        return 'none'
     else:
-        print('Time period invalid!')
+        return 'none'
 
 
 def get_month(city):
@@ -190,18 +199,35 @@ def display_data(df):
     Returns:
         pandas df object
     '''
-    display = input('\nWould you like to view individual trip data?'
-                    'Type \'yes\' or \'no\'.\n')
+    
+    invalid_input = True
+    while invalid_input:
+        display = input('\nWould you like to view individual trip data?'
+                        'Type \'yes\' or \'no\'.\n')
+        if display.lower() in ('yes', 'no'):
+            invalid_input = False
+        else:
+            print('Input invalid! Please re-enter.')
+
     if display == 'yes':
         print(df.head(5))
 
     count = 5
     display_contd = 'continue'
     while display_contd == 'continue':
-        display_contd = input('\n\'continue\' or \'stop\'?\n')
-        print(df[count:count+5])
-        count += 5
-    
+        invalid_input = True
+        while invalid_input:
+            display_contd = input('\n\'continue\' or \'stop\'?\n')
+            if display_contd.lower() in ('continue', 'stop'):
+                invalid_input = False
+                if display_contd == 'continue':
+                    print(df[count:count+5])
+                    count += 5
+                else:
+                    break
+            else:
+                print('Input invalid! Please re-enter.')
+
 
 def statistics():
     '''Calculates and prints out the descriptive statistics about a city and time period
