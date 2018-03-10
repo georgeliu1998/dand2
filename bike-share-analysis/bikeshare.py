@@ -8,6 +8,18 @@ new_york_city = 'new_york_city.csv'
 washington = 'washington.csv'
 
 
+def read_data(filename):
+    '''Given a filename, read in the data as pandas df
+    Args: 
+        filename
+    Return:
+        df
+    '''
+    with open(filename, 'r') as f_in:
+        df = pd.read_csv(filename)
+        return df
+
+
 def get_city():
     '''Asks the user for a city and returns the filename for that city's bike share data.
 
@@ -59,35 +71,40 @@ def get_time_period():
         return 'none'
 
 
-def get_month(city):
+def get_month():
     '''Asks the user for a month and returns the specified month data as a df.
 
     Args:
-        city.
+        none.
     Returns:
-        (pd df object) df 
+        (str) month number
     '''
-    month = input('\nWhich month? Enter the month number such as 1 for Jannuary:\n')
-    with open(city, 'r') as f_in:
-        df=pd.read_csv(city)
-        df['month'] = pd.to_datetime(df['Start Time']).dt.month
-        df = df.query('month == @month')
-    return df
+    invalid_month = True
+    while invalid_month:
+        month = input('\nWhich month? Enter the month number such as 1 for Jannuary:\n')
+        if int(month) in list(range(1, 13)):
+            invalid_month = False
+        else:
+            print('Month invalid! Please re-enter.')
+    return month 
+    
 
-def get_day(city):
+def get_day():
     '''Asks the user for a day and returns the specified day.
 
     Args:
-        city.
+        none.
     Returns:
-        (pd df object) df
+        (str) day number
     '''
-    day = input('\nWhich day? Please type your response as an integer, 1 for Monday, 2 for Tuesday\n')
-    with open(city, 'r') as f_in:
-        df=pd.read_csv(city)
-        df['day'] = pd.to_datetime(df['Start Time']).dt.dayofweek
-        df = df.query('day == @day')
-    return df
+    invalid_day = True
+    while invalid_day:
+        day = input('\nWhich day? Please type your response as an integer, 1 for Monday, 2 for Tuesday\n')
+        if int(day) in list(range(1, 8)):
+            invalid_day = False
+        else:
+            print('Day invalid! Please re-enter.')
+    return day      
 
 
 def popular_month(df):
@@ -118,7 +135,7 @@ def popular_hour(df):
     Returns:
         (int) hour number
     '''
-    # TODO: complete function
+    return pd.to_datetime(df['Start Time']).dt.hour.value_counts().idxmax()
 
 
 def trip_duration(df):
@@ -188,7 +205,6 @@ def birth_years(df):
     return oldest, youngest, popular
 
 
-
 def display_data(df):
     '''Displays five lines of data if the user specifies that they would like to.
     After displaying five lines, ask the user if they would like to see five more,
@@ -238,22 +254,25 @@ def statistics():
     Returns:
         none.
     '''
-    # Filter by city (Chicago, New York, Washington)
+    # Get the user's inputs
     city = get_city()
-
-    # Filter by time period (month, day, none)
     time_period = get_time_period()
 
-    print('Calculating the statistics...')
-
-    # What is the most popular month for start time?
+    # Get the data and filter as needed
+    df = read_data(city)
     if time_period == 'month':
-        df = get_month(city)
+        month = get_month()
+        df['month'] = pd.to_datetime(df['Start Time']).dt.month
+        df = df.query('month == @month')
     elif time_period == 'day':
-        df = get_day(city)
+        day = get_day()
+        df['day'] = pd.to_datetime(df['Start Time']).dt.dayofweek
+        df = df.query('day == @day')
     else:
-        with open(city, 'r') as f_in:
-            df=pd.read_csv(city)
+        pass
+       
+
+    print('Calculating the statistics...')
 
     print('\nWhat is the most popular day of week (Monday, Tuesday, etc.) for start time?') 
     print(popular_day(df))
